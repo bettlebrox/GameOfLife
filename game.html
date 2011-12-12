@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
+		<script type="text/javascript" src="gameOfLife.js"></script>
+		<script type="text/javascript">
+			var board = new Board();	
+			var go = true;
+			var oldCells = []
+			function run(){
+				var cells = board.getLiveCells();
+				for(var cell in oldCells){
+					$("#"+oldCells[cell].hash()).toggleClass("livecell", false);
+				}
+				for(var cell in cells){
+					$("#"+cells[cell].hash()).toggleClass("livecell", true);
+				}
+				oldCells = cells;
+				board.tick();
+				if(go){
+					setTimeout(function(){
+							run();
+						},1000);
+				}
+			}
+			function row(rowNum,size){
+				var row = $("<tr>");
+				for(var j=0; j<size; j++){
+					row.append($("<td>").html("<div id='"+j+"_"+rowNum+"' class='cell'><div>"));
+				}
+				return row;
+			}
+			$(document).ready(function(){
+				var size = 40;
+				for(var i=0; i<size; i++){
+					$("#board").append(row(i,size));
+				}
+				$(".cell").click(function(eventObject){
+					var xy = eventObject.target.id.split("_");
+					$(this).toggleClass("livecell", true);
+					board.setLiveCell(parseInt(xy[0]),parseInt(xy[1]));
+					});
+				$("#stopgo").click(function(){
+					if(go){
+						go = false;
+						this.value = "go";
+					}else{
+						go = true;
+						run();
+						this.value = "stop";
+					}
+				});
+//				board.init([{"x":2,"y":1},{"x":3,"y":2},{"x":1,"y":3},
+//								{"x":2,"y":3},{"x":3,"y":3}
+//					]);		
+				run();
+			});
+		</script>
+		<style type="text/css">
+			.cell{
+				background-color: grey;
+				width: 20px;
+				height: 20px;
+			}
+			.livecell{
+				background-color: green;
+				width: 20px;
+				height: 20px;
+			}
+			table{
+				border-spacing: 0.1px;
+			}
+		</style>
+	</head>
+	<body>
+		<input type="button" id="stopgo" value="stop"></input>
+		<table id="board">
+		</table>
+	</body>
+</html>
+
